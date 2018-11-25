@@ -8,6 +8,7 @@
 /// \brief tests for <cnl/_impl/duplex_integer/type.h>
 
 #include <cnl/_impl/duplex_integer/ctors.h>
+#include <cnl/_impl/duplex_integer/operators.h>
 #include <cnl/_impl/duplex_integer/type.h>
 
 #include <cnl/_impl/type_traits/identical.h>
@@ -252,6 +253,17 @@ namespace {
                         cnl::uint64{0xFEDCBA9876543210},
                         static_cast<cnl::uint64>(
                                 cnl::_impl::duplex_integer<cnl::uint64, cnl::uint64>{UINT64_C(0xFEDCBA9876543210)})),
+                "");
+    }
+
+    namespace test_to_rep {
+        static_assert(
+                identical(
+                        4567u,
+                        cnl::to_rep<cnl::_impl::duplex_integer<
+                                cnl::_impl::duplex_integer<unsigned int, unsigned int>,
+                                cnl::_impl::duplex_integer<unsigned int, unsigned int> >>{}(
+                                        4567)),
                 "");
     }
 }

@@ -37,28 +37,28 @@ namespace cnl {
         ////////////////////////////////////////////////////////////////////////////////
         // optimal_multiword
 
-        template<typename Word, typename Signedness = set_signedness_t<int, is_signed<Word>::value>>
+        template<typename Word, bool SupportMultiply, typename Signedness = set_signedness_t<int, is_signed<Word>::value>>
         struct optimal_multiword;
 
-        template<typename Narrowest>
-        struct optimal_multiword<Narrowest, unsigned> {
+        template<typename Narrowest, bool SupportMultiply>
+        struct optimal_multiword<Narrowest, SupportMultiply, unsigned> {
             static constexpr auto double_word_digits = max_digits<Narrowest>::value;
             static_assert(double_word_digits>=2 && is_power_of_two<double_word_digits>::value,
                     "invalid integer type, Narrowest");
 
             // Because multiword_integer needs to perform double-width arithmetic operations,
             // its word type should be half the maximum width.
-            static constexpr auto word_digits = double_word_digits/2;
+            static constexpr auto word_digits = SupportMultiply ? double_word_digits/2 : double_word_digits;
             using word = set_digits_t<Narrowest, word_digits>;
             static_assert(digits<word>::value==word_digits, "failed to half a double-width word");
 
             using type = word;
         };
 
-        template<typename Narrowest>
-        struct optimal_multiword<Narrowest, signed> {
+        template<typename Narrowest, bool SupportMultiply>
+        struct optimal_multiword<Narrowest, SupportMultiply, signed> {
             using unsiged_narrowest = make_unsigned_t<Narrowest>;
-            using unsigned_multiword_integer = optimal_multiword<unsiged_narrowest, unsigned>;
+            using unsigned_multiword_integer = optimal_multiword<unsiged_narrowest, SupportMultiply, unsigned>;
 
             using type = make_signed_t<typename unsigned_multiword_integer::type>;
         };
@@ -66,9 +66,9 @@ namespace cnl {
         ////////////////////////////////////////////////////////////////////////////////
         // optimal_multiword_integer
 
-        template<int Digits, typename Narrowest>
+        template<int Digits, typename Narrowest, bool SupportMultiply = true>
         struct optimal_multiword_integer {
-            using word = typename optimal_multiword<Narrowest>::type;
+            using word = typename optimal_multiword<Narrowest, SupportMultiply>::type;
             static constexpr auto num_sign_bits = is_signed<word>::value;
             static constexpr auto word_digits = digits<word>::value+num_sign_bits;
             static constexpr auto required_num_words = (Digits+num_sign_bits+word_digits-1)/word_digits;
@@ -79,8 +79,9 @@ namespace cnl {
             using type = multiword_integer<word, plural_num_words>;
         };
 
-        template<int Digits, typename Narrowest>
-        using optimal_multiword_integer_t = typename optimal_multiword_integer<Digits, Narrowest>::type;
+        template<int Digits, typename Narrowest, bool SupportMultiply = true>
+        using optimal_multiword_integer_t = typename optimal_multiword_integer<
+                Digits, Narrowest, SupportMultiply>::type;
     }
 }
 

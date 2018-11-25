@@ -12,11 +12,28 @@
 #include "../operators.h"
 #include "forward_declaration.h"
 #include "from_rep.h"
+#include "from_value.h"
 #include "numeric_limits.h"
 
 /// compositional numeric library
 namespace cnl {
     namespace _impl {
+        template<typename LhsWord, int LhsNumWords, class Rhs>
+        constexpr auto operator<<(multiword_integer<LhsWord, LhsNumWords> const& lhs, Rhs const& rhs)
+        -> multiword_integer<LhsWord, LhsNumWords>
+        {
+            return multiword_integer<LhsWord, LhsNumWords>(
+                    to_rep(lhs) << set_signedness_t<int, is_signed<Rhs>::value>(rhs));
+        }
+
+        template<typename LhsWord, int LhsNumWords, class Rhs>
+        constexpr auto operator>>(multiword_integer<LhsWord, LhsNumWords> const& lhs, Rhs const& rhs)
+        -> multiword_integer<LhsWord, LhsNumWords>
+        {
+            return multiword_integer<LhsWord, LhsNumWords>(
+                    to_rep(lhs) >> set_signedness_t<int, is_signed<Rhs>::value>(rhs));
+        }
+
         template<class Operator, typename LhsWord, int LhsNumWords, typename RhsWord, int RhsNumWords>
         struct binary_operator<
                 Operator,

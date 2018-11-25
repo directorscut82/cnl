@@ -21,5 +21,10 @@ namespace {
                 identical(
                         cnl::_impl::multiword_integer<long, 4>{4},
                         cnl::_impl::make_number<cnl::_impl::multiword_integer<long, 4>>(4)), "");
+        static_assert(
+                identical(
+                        cnl::_impl::multiword_integer<long unsigned, 2>{123},
+                        cnl::_impl::make_number<cnl::_impl::multiword_integer<long unsigned, 2>>(123)),
+                "");
     }
 }

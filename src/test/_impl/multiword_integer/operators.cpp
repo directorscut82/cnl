@@ -20,6 +20,16 @@ namespace {
                 cnl::numeric_limits<cnl::_impl::multiword_integer<int>>::is_specialized,
                 "");
     }
+
+    namespace test_equal {
+        static_assert(
+                identical(
+                        cnl::_impl::multiword_integer<unsigned int, 4>{100000000},
+                        cnl::_impl::multiword_integer<unsigned int, 4>{10000}
+                        *cnl::_impl::multiword_integer<unsigned int, 4>{10000}),
+                "");
+    }
+
     namespace test_equal {
         static_assert(
                 cnl::_impl::multiword_integer<int>{0}==cnl::_impl::multiword_integer<int>{},
@@ -111,6 +121,18 @@ namespace {
                         cnl::_impl::multiword_integer<long int, 4>{246},
                         cnl::_impl::multiword_integer<long int, 4>{123}
                                 << cnl::_impl::multiword_integer<long int, 4>{1}),
+                "");
+        static_assert(
+                identical(
+                        cnl::_impl::multiword_integer<long unsigned, 2>{246},
+                        cnl::_impl::multiword_integer<long unsigned, 2>{123}
+                                << 1L),
+                "");
+        static_assert(
+                identical(
+                        cnl::_impl::multiword_integer<long unsigned, 2>{246},
+                        cnl::_impl::multiword_integer<long unsigned, 2>{123}
+                                << cnl::_impl::multiword_integer<long unsigned, 2>{1}),
                 "");
     }
 }

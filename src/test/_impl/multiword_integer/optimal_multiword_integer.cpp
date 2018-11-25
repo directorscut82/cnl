@@ -14,43 +14,63 @@ namespace {
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int64, 2>,
-                    cnl::_impl::optimal_multiword_integer_t<1, cnl::int8>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<1, cnl::int8, true>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::uint64, 2>,
-                    cnl::_impl::optimal_multiword_integer_t<77, cnl::uint32>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<77, cnl::uint32, true>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int64, 3>,
-                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64, true>>::value,
+            "cnl::_impl::optimal_multiword_integer<>");
+    static_assert(
+            assert_same<
+                    cnl::_impl::multiword_integer<cnl::int128, 2>,
+                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64, false>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int64, 4>,
-                    cnl::_impl::optimal_multiword_integer_t<192, cnl::int16>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<192, cnl::int16, true>>::value,
+            "cnl::_impl::optimal_multiword_integer<>");
+    static_assert(
+            assert_same<
+                    cnl::_impl::multiword_integer<cnl::int128, 2>,
+                    cnl::_impl::optimal_multiword_integer_t<192, cnl::int16, false>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
 #else
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int32, 2>,
-                    cnl::_impl::optimal_multiword_integer_t<1, cnl::int8>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<1, cnl::int8, true>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::uint32, 3>,
-                    cnl::_impl::optimal_multiword_integer_t<77, cnl::uint32>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<77, cnl::uint32, true>>::value,
+            "cnl::_impl::optimal_multiword_integer<>");
+    static_assert(
+            assert_same<
+                    cnl::_impl::multiword_integer<cnl::uint64, 2>,
+                    cnl::_impl::optimal_multiword_integer_t<77, cnl::uint32, false>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int32, 6>,
-                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64, true>>::value,
+            "cnl::_impl::optimal_multiword_integer<>");
+    static_assert(
+            assert_same<
+                    cnl::_impl::multiword_integer<cnl::int32, 6>,
+                    cnl::_impl::optimal_multiword_integer_t<191, cnl::int64, false>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
     static_assert(
             assert_same<
                     cnl::_impl::multiword_integer<cnl::int32, 7>,
-                    cnl::_impl::optimal_multiword_integer_t<192, cnl::int16>>::value,
+                    cnl::_impl::optimal_multiword_integer_t<192, cnl::int16, true>>::value,
             "cnl::_impl::optimal_multiword_integer<>");
 #endif
 }

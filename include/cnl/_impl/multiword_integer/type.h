@@ -7,9 +7,11 @@
 #if !defined(CNL_IMPL_MULTIWORD_INTEGER_TYPE_H)
 #define CNL_IMPL_MULTIWORD_INTEGER_TYPE_H 1
 
-#include "../number_base.h"
 #include "forward_declaration.h"
+#include "numeric_limits.h"
 #include "rep.h"
+#include "../duplex_integer/numeric_limits.h"
+#include "../number_base.h"
 
 /// compositional numeric library
 namespace cnl {

@@ -8,7 +8,6 @@
 #define CNL_IMPL_DUPLEX_INTEGER_CTORS_H 1
 
 #include "type.h"
-#include "operators.h"
 
 /// compositional numeric library
 namespace cnl {

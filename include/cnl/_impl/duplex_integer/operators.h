@@ -7,11 +7,6 @@
 #if !defined(CNL_IMPL_DUPLEX_INTEGER_OPERATORS_H)
 #define CNL_IMPL_DUPLEX_INTEGER_OPERATORS_H 1
 
-#include "../../elastic_integer.h"
-#include "../common.h"
-#include "../num_traits/to_rep.h"
-#include "../operators.h"
-#include "../type_traits/set_signedness.h"
 #include "ctors.h"
 #include "digits.h"
 #include "make_signed.h"
@@ -19,7 +14,14 @@
 #include "numeric_limits.h"
 #include "set_digits.h"
 #include "set_width.h"
+#include "to_rep.h"
 #include "type.h"
+#include "../common.h"
+#include "../num_traits/to_rep.h"
+#include "../operators.h"
+#include "../type_traits/set_signedness.h"
+#include "../wide_integer/type.h"
+#include "../wide_integer/operators.h"
 
 /// compositional numeric library
 namespace cnl {
@@ -107,9 +109,6 @@ namespace cnl {
         struct binary_operator<multiply_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
             using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            using elastic_upper = from_value_t<elastic_integer<>, Upper>;
-            using elastic_lower = from_value_t<elastic_integer<>, Lower>;
-
             constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const
             -> _duplex_integer
             {
@@ -117,16 +116,18 @@ namespace cnl {
             }
 
             static constexpr auto multiply_components(
-                    elastic_upper const& lhs_upper,
-                    elastic_lower const& lhs_lower,
-                    elastic_upper const& rhs_upper,
-                    elastic_lower const& rhs_lower)
+                    Upper const& lhs_upper,
+                    Lower const& lhs_lower,
+                    Upper const& rhs_upper,
+                    Lower const& rhs_lower)
             -> _duplex_integer
             {
+                using lower_upper = wide_integer_rep_t<digits<Upper>::value+digits<Lower>::value, to_rep_t<Upper>, false>;
+                using lower_lower = wide_integer_rep_t<digits<Lower>::value+digits<Lower>::value, to_rep_t<Lower>, false>;
                 return
-                        to_rep((lhs_upper*rhs_lower) << digits<elastic_lower>::value) // upper*lower
-                                +to_rep((lhs_lower*rhs_upper) << digits<elastic_lower>::value) // lower*upper
-                                +to_rep((lhs_lower*rhs_lower) << 0); // lower*lower
+                        to_rep((lower_upper{lhs_upper}*lower_upper{rhs_lower}) << digits<Lower>::value)
+                                +to_rep((lower_upper{lhs_lower}*lower_upper{rhs_upper}) << digits<Lower>::value)
+                                +to_rep((lower_lower{lhs_lower}*lower_lower{rhs_lower}) << 0);
             }
         };
 
@@ -253,7 +254,7 @@ namespace cnl {
             -> _duplex_integer
             {
                 return _duplex_integer(
-                        static_cast<Upper>(cnl::sensible_left_shift(lhs.upper(), rhs))
+                        static_cast<Upper>(sensible_left_shift(lhs.upper(), rhs))
                                 | static_cast<Upper>(extra_sensible_right_shift(lhs.lower(), width<Lower>::value-rhs)),
                         static_cast<Lower>(sensible_left_shift(lhs.lower(), rhs)));
             }
@@ -285,9 +286,9 @@ namespace cnl {
         // comparison_operator
         template<typename Upper, typename Lower>
         struct comparison_operator<equal_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
                 return lhs.lower()==rhs.lower() && lhs.upper()==rhs.upper();
             }
@@ -295,9 +296,9 @@ namespace cnl {
 
         template<typename Upper, typename Lower>
         struct comparison_operator<not_equal_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
                 return lhs.lower()!=rhs.lower() || lhs.upper()!=rhs.upper();
             }
@@ -305,9 +306,9 @@ namespace cnl {
 
         template<typename Upper, typename Lower>
         struct comparison_operator<less_than_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
                 return lhs.upper()<rhs.upper() || (lhs.upper()==rhs.upper() && lhs.lower()<rhs.lower());
             }
@@ -315,19 +316,19 @@ namespace cnl {
 
         template<typename Upper, typename Lower>
         struct comparison_operator<less_than_or_equal_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
-                return !comparison_operator<greater_than_op, duplex_integer, duplex_integer>{}(lhs, rhs);
+                return !comparison_operator<greater_than_op, _duplex_integer, _duplex_integer>{}(lhs, rhs);
             }
         };
 
         template<typename Upper, typename Lower>
         struct comparison_operator<greater_than_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
                 return lhs.upper()>rhs.upper() || (lhs.upper()==rhs.upper() && lhs.lower()>rhs.lower());
             }
@@ -335,11 +336,11 @@ namespace cnl {
 
         template<typename Upper, typename Lower>
         struct comparison_operator<greater_than_or_equal_op, duplex_integer<Upper, Lower>, duplex_integer<Upper, Lower>> {
-            using duplex_integer = duplex_integer<Upper, Lower>;
+            using _duplex_integer = duplex_integer<Upper, Lower>;
 
-            constexpr auto operator()(duplex_integer const& lhs, duplex_integer const& rhs) const -> bool
+            constexpr auto operator()(_duplex_integer const& lhs, _duplex_integer const& rhs) const -> bool
             {
-                return !comparison_operator<less_than_op, duplex_integer, duplex_integer>{}(lhs, rhs);
+                return !comparison_operator<less_than_op, _duplex_integer, _duplex_integer>{}(lhs, rhs);
             }
         };
 
